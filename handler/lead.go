@@ -22,21 +22,21 @@ func NewLeadHandler(service oteldemo.LeadService, log *zap.SugaredLogger) *LeadH
 	}
 }
 
-func (lh LeadHandler) Create(rw http.ResponseWriter, r *http.Request) {
+func (handler LeadHandler) Create(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var request oteldemo.LeadRequest
 
 	if err := decode(r, &request); err != nil {
-		lh.log.Errorw("GetByID", "error", err.Error())
+		handler.log.Errorw("GetByID", "error", err.Error())
 		respondErr(ctx, rw, http.StatusBadRequest, err)
 		return
 	}
 
 	lead := oteldemo.CreateLeadByParam(request)
 
-	if err := lh.service.Create(r.Context(), lead); err != nil {
-		lh.log.Errorw("Create", "error", err.Error())
+	if err := handler.service.Create(r.Context(), lead); err != nil {
+		handler.log.Errorw("Create", "error", err.Error())
 		switch {
 		case errors.Is(err, oteldemo.ErrDuplicatedLead):
 			respondErr(ctx, rw, http.StatusConflict, err)
@@ -50,21 +50,21 @@ func (lh LeadHandler) Create(rw http.ResponseWriter, r *http.Request) {
 	respond(rw, http.StatusCreated, &lead)
 }
 
-func (lh LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
+func (handler LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
-		lh.log.Errorw("GetByID", "error", err.Error())
+		handler.log.Errorw("GetByID", "error", err.Error())
 		respondErr(ctx, rw, http.StatusBadRequest, errors.New("ID is not in its proper form"))
 		return
 	}
 
-	lead, err := lh.service.GetByID(ctx, id.String())
+	lead, err := handler.service.GetByID(ctx, id.String())
 	if err != nil {
-		lh.log.Errorw("GetByID", "error", err.Error())
-		switch err {
-		case oteldemo.ErrLeadNotFound:
+		handler.log.Errorw("GetByID", "error", err.Error())
+		switch {
+		case errors.Is(err, oteldemo.ErrLeadNotFound):
 			respondErr(ctx, rw, http.StatusNotFound, err)
 		default:
 			respondErr(ctx, rw, http.StatusInternalServerError, err)

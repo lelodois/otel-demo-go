@@ -67,7 +67,7 @@ func (ls LeadService) GetByID(ctx context.Context, id string) (oteldemo.Lead, er
 		address, 
 		created_at, 
 		modified_at,
-		group_id,
+		group_id 
 	FROM leads 
 	WHERE id=$1`
 

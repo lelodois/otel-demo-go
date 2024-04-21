@@ -14,16 +14,18 @@ Sample golang application showcasing how to instrumenting distributed tracing wi
 $ make demo
 ```
 
-## Fill data
+## Using api
 
 ````
-curl --location 'http://localhost:4000/leads' --header 'Content-Type: application/json' --data-raw 
+curl --location 'http://localhost:3000/leads' --header 'Content-Type: application/json' --data-raw 
 '{
     "name": "Lead Tasty Plastic Pizza",
     "email": "lead@Practical Frozen Table.com",
     "phone_number": "11 - 323-490-9912",
     "address": "46438 Schroeder Island"
 }'
+
+curl --location 'http://localhost:3000/leads/:id'
 ````
 
 ## Stop
