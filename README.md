@@ -2,6 +2,7 @@
 
 Sample golang application showcasing how to instrumenting distributed tracing with OpenTelemetry and Jaeger
 
+
 ## Prerequisites
 
 - go
@@ -44,10 +45,12 @@ $ make stop
 ## Doc
 
 Jaeger: https://www.jaegertracing.io/docs/1.56/getting-started/
-![jaeger ui](docs%2Fjaeger-ui.png)
+![jaeger ui](docs%2Fjaeger_ui.png)
+---
 
 Docker containers
 ![docker](docs%2Fdocker.png)
+---
 
 Postgres
 ![database](docs%2Fdatabase.png)
