@@ -46,8 +46,8 @@ func (lh LeadHandler) Create(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	attribute := otelutil.Attribute("groupId", lead.Group)
-	respond(ctx, http.StatusCreated, attribute)
-	respondWriter(rw, http.StatusCreated, &lead)
+	trace(ctx, http.StatusCreated, attribute)
+	respond(rw, http.StatusCreated, &lead)
 }
 
 func (lh LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
@@ -73,6 +73,6 @@ func (lh LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	attribute := otelutil.Attribute("groupId", lead.Group)
-	respond(ctx, http.StatusOK, attribute)
-	respondWriter(rw, http.StatusOK, &lead)
+	trace(ctx, http.StatusOK, attribute)
+	respond(rw, http.StatusOK, &lead)
 }
