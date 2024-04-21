@@ -51,7 +51,7 @@ func run(serverName string, log *zap.SugaredLogger) error {
 			WriteTimeout    time.Duration `conf:"default:10s"`
 			IdleTimeout     time.Duration `conf:"default:120s"`
 			ShutdownTimeout time.Duration `conf:"default:20s"`
-			Host            string        `conf:"default:0.0.0.0:3000"`
+			Host            string        `conf:"default:0.0.0.0:4000"`
 		}
 		DB struct {
 			User         string `conf:"default:leedsvc"`
@@ -130,7 +130,7 @@ func run(serverName string, log *zap.SugaredLogger) error {
 	log.Infow("startup", "status", "initializing router")
 
 	leadService := postgres.NewLeadService(db)
-	leadHandler := handler.NewLeadHanlder(leadService, log)
+	leadHandler := handler.NewLeadHandler(leadService, log)
 
 	r := chi.NewRouter()
 

@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	oteldemo "github.com/phbpx/otel-demo"
+	"github.com/uptrace/opentelemetry-go-extra/otelutil"
 	"io"
 	"net/http"
 
@@ -18,10 +20,14 @@ func decode(r *http.Request, into interface{}) error {
 	return json.Unmarshal(rawJson, into)
 }
 
-func respond(ctx context.Context, rw http.ResponseWriter, status int, data interface{}) {
+func respond(ctx context.Context, status int, keyValue attribute.KeyValue) {
 	ctx, span := otel.GetTracerProvider().Tracer("").Start(ctx, "handler.respond")
 	span.SetAttributes(attribute.Int("http.status", status))
-	defer span.End()
+	span.SetAttributes(keyValue)
+	span.End()
+}
+
+func respondWriter(rw http.ResponseWriter, status int, data *oteldemo.Lead) {
 
 	if status == http.StatusNoContent || data == nil {
 		rw.WriteHeader(status)
@@ -36,11 +42,10 @@ func respond(ctx context.Context, rw http.ResponseWriter, status int, data inter
 	rw.Header().Add("Content-Type", "application-json")
 	rw.WriteHeader(status)
 	rw.Write(rawJson)
-}
 
+}
 func respondErr(ctx context.Context, rw http.ResponseWriter, status int, err error) {
-	respond(ctx, rw, status, map[string]string{
-		"code":  http.StatusText(status),
-		"error": err.Error(),
-	})
+	keyValue := otelutil.Attribute("err", err)
+	respond(ctx, status, keyValue)
+	respondWriter(rw, status, nil)
 }

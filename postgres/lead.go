@@ -30,9 +30,9 @@ func (ls LeadService) Create(ctx context.Context, lead oteldemo.Lead) error {
 
 	query := `
 	INSERT INTO leads (
-		id, name, email, phone_number, address, created_at, modified_at
+		id, name, email, phone_number, address, created_at, modified_at, group_id
 	) VALUES (
-		$1, $2, $3, $4, $5, $6, $7
+		$1, $2, $3, $4, $5, $6, $7, $8
 	)`
 
 	_, err = tx.ExecContext(ctx, query,
@@ -43,6 +43,7 @@ func (ls LeadService) Create(ctx context.Context, lead oteldemo.Lead) error {
 		lead.Address,
 		lead.CreatedAt,
 		lead.ModifiedAt,
+		lead.Group,
 	)
 
 	if err != nil {
@@ -65,7 +66,8 @@ func (ls LeadService) GetByID(ctx context.Context, id string) (oteldemo.Lead, er
 		phone_number, 
 		address, 
 		created_at, 
-		modified_at 
+		modified_at,
+		group_id,
 	FROM leads 
 	WHERE id=$1`
 
@@ -80,6 +82,7 @@ func (ls LeadService) GetByID(ctx context.Context, id string) (oteldemo.Lead, er
 		&lead.Address,
 		&lead.CreatedAt,
 		&lead.ModifiedAt,
+		&lead.Group,
 	)
 
 	if err != nil {

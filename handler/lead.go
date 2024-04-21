@@ -2,13 +2,12 @@ package handler
 
 import (
 	"errors"
-	"net/http"
-	"time"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	oteldemo "github.com/phbpx/otel-demo"
+	"github.com/uptrace/opentelemetry-go-extra/otelutil"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 type LeadHandler struct {
@@ -16,7 +15,7 @@ type LeadHandler struct {
 	log     *zap.SugaredLogger
 }
 
-func NewLeadHanlder(service oteldemo.LeadService, log *zap.SugaredLogger) *LeadHandler {
+func NewLeadHandler(service oteldemo.LeadService, log *zap.SugaredLogger) *LeadHandler {
 	return &LeadHandler{
 		service: service,
 		log:     log,
@@ -26,32 +25,29 @@ func NewLeadHanlder(service oteldemo.LeadService, log *zap.SugaredLogger) *LeadH
 func (lh LeadHandler) Create(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var lead oteldemo.Lead
+	var request oteldemo.LeadRequest
 
-	if err := decode(r, &lead); err != nil {
+	if err := decode(r, &request); err != nil {
 		lh.log.Errorw("GetByID", "error", err.Error())
 		respondErr(ctx, rw, http.StatusBadRequest, err)
 		return
 	}
 
-	now := time.Now().UTC()
-
-	lead.ID = uuid.NewString()
-	lead.CreatedAt = now
-	lead.ModifiedAt = now
+	lead := oteldemo.CreateLeadByParam(request)
 
 	if err := lh.service.Create(r.Context(), lead); err != nil {
 		lh.log.Errorw("Create", "error", err.Error())
-		switch err {
-		case oteldemo.ErrDuplicatedLead:
+		switch {
+		case errors.Is(err, oteldemo.ErrDuplicatedLead):
 			respondErr(ctx, rw, http.StatusConflict, err)
 		default:
 			respondErr(ctx, rw, http.StatusInternalServerError, err)
 		}
 		return
 	}
-
-	respond(ctx, rw, http.StatusCreated, lead)
+	attribute := otelutil.Attribute("groupId", lead.Group)
+	respond(ctx, http.StatusCreated, attribute)
+	respondWriter(rw, http.StatusCreated, &lead)
 }
 
 func (lh LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
@@ -76,5 +72,7 @@ func (lh LeadHandler) GetByID(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respond(ctx, rw, http.StatusOK, lead)
+	attribute := otelutil.Attribute("groupId", lead.Group)
+	respond(ctx, http.StatusOK, attribute)
+	respondWriter(rw, http.StatusOK, &lead)
 }
