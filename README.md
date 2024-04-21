@@ -33,3 +33,21 @@ curl --location 'http://localhost:3000/leads/:id'
 ```sh
 $ make stop
 ```
+
+## Ports
+
+ - Jaeger: 16686
+ - Database: 5432
+ - App: 3000
+
+
+## Doc
+
+Jaeger: https://www.jaegertracing.io/docs/1.56/getting-started/
+![jaeger ui](docs%2Fjaeger-ui.png)
+
+Docker containers
+![docker](docs%2Fdocker.png)
+
+Postgres
+![database](docs%2Fdatabase.png)
