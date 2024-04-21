@@ -8,7 +8,6 @@ Sample golang application showcasing how to instrumenting distributed tracing wi
 - go
 - docker
 - docker-compose
-- jaeger: https://www.jaegertracing.io/docs/1.56/getting-started/
 
 ## Start demo application
 
@@ -38,7 +37,7 @@ $ make stop
 
 ## Ports
 
- - Jaeger: 16686
+ - Jaeger: 16686 (https://www.jaegertracing.io/docs/1.56/getting-started)
  - Database: 5432
  - App: 3000
 
